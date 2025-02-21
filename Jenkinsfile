@@ -32,7 +32,7 @@ pipeline {
                 expression { approvalStatus["ApprovalStatus"] == 'Approved' }
             }
             steps {
-                sh "terraform apply"
+                sh "terraform apply -auto-approve"
             }
         }
     }
