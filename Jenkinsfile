@@ -3,12 +3,10 @@ pipeline {
     options {
         ansiColor('xterm')
     }
-    parameters {
-        booleanParam(name: "Destroy", defaultValue: false)
-    }
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS-Access-key')
         AWS_SECRET_ACCESS_KEY = credentials('AWS-Secret-access-key')
+        Destroy = "false"
     }
     agent any
     stages {
@@ -39,11 +37,11 @@ pipeline {
             }
             steps {
                 script {
-                    if(params.Destroy){
-                        sh "terraform apply -auto-approve"
+                    if(env.Destroy == 'true'){
+                        sh "terraform destroy -auto-approve"
                     }
                     else{
-                        sh "terraform destroy -auto-approve"
+                        sh "terraform apply -auto-approve"
                     }
                 }
             }
