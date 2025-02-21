@@ -1,7 +1,5 @@
+
 pipeline {
-    parameters {
-        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
-    } 
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS-Access-key')
         AWS_SECRET_ACCESS_KEY = credentials('AWS-Secret-access-key')
@@ -10,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/SachinJayswal01/Automating-infrastructure-deployments-with-Terraform-and-Jenkins.git'
             }
         }
         stage('Plan') {
@@ -19,31 +17,23 @@ pipeline {
                 sh "terraform plan"
             }
         }
-        stage('Approval') {
-           when {
-               not {
-                   equals expected: true, actual: params.autoApprove
-               }
-           }
-
-           steps {
-               script {
-                    input message: "Do you want to apply the plan?",
-                    parameters: [text(name: 'Plan', description: 'Please review the plan')]
-               }
-           }
-       }
-
+                stage('Approval') {
+            steps {
+                script {
+                   timeout(time: 1, unit: 'HOURS') {
+                        approvalStatus = input message: 'You want to approve this build? ', ok: 'Submit', parameters: [choice(choices: ['Approved', 'Rejected'], name: 'ApprovalStatus')], submitter: 'user1,user2', submitterParameter: 'approverID'
+                   }
+                }
+                echo "Approval status: ${approvalStatus}"
+            }
+        }
         stage('Apply') {
+            when {
+                expression { approvalStatus["ApprovalStatus"] == 'Approved' }
+            }
             steps {
                 sh "terraform apply"
             }
         }
     }
-    post {
-        always {
-            cleanWs()
-        }
-    }
 }
-
