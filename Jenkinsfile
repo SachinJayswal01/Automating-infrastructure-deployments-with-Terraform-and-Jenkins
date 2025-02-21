@@ -4,7 +4,7 @@ pipeline {
         ansiColor('xterm')
     }
     parameters {
-        booleanParam(name: "Destroy", defaultValue: true)
+        booleanParam(name: "Destroy", value: "true")
     }
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS-Access-key')
@@ -39,7 +39,7 @@ pipeline {
             }
             steps {
                 script {
-                    if(params.Destroy == true){
+                    if(params.Destroy == 'true'){
                         sh "terraform destroy -auto-approve"
                     }
                     else{
