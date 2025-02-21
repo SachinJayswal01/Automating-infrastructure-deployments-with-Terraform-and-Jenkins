@@ -6,7 +6,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS-Access-key')
         AWS_SECRET_ACCESS_KEY = credentials('AWS-Secret-access-key')
-        Destroy = "true"
+        Destroy = "false"
     }
     agent any
     stages {
