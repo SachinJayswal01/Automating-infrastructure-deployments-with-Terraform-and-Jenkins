@@ -3,7 +3,9 @@ pipeline {
     options {
         ansiColor('xterm')
     }
-    Destroy= true
+    parameters {
+        booleanParam(name: "Destroy", defaultValue: false)
+    }
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS-Access-key')
         AWS_SECRET_ACCESS_KEY = credentials('AWS-Secret-access-key')
@@ -33,16 +35,17 @@ pipeline {
         }
         stage('Apply') {
             when {
-                expression { Destroy= false && approvalStatus["ApprovalStatus"] == 'Approved' }
+                expression { approvalStatus["ApprovalStatus"] == 'Approved' }
             }
             steps {
-                sh "terraform apply -auto-approve"
-            }
-            when {
-                expression { Destroy= true && approvalStatus["ApprovalStatus"] == 'Approved' }
-            }
-            steps {
-                sh "terraform destroy -auto-approve"
+                script {
+                    if(params.Destroy == true){
+                        sh "terraform destroy -auto-approve"
+                    }
+                    else{
+                        sh "terraform apply -auto-approve"
+                    }
+                }
             }
         }
     }
