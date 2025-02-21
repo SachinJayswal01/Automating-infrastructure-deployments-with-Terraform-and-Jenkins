@@ -4,7 +4,7 @@ pipeline {
         ansiColor('xterm')
     }
     parameters {
-        booleanParam(name: "Destroy", defaultValue: false)
+        booleanParam(name: "Destroy", defaultValue: true)
     }
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS-Access-key')
